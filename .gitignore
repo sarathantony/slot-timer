@@ -1,0 +1,11 @@
+# for local installation and testing (npm link)
+./local-installation
+
+# dist
+dist
+
+# node modules
+node_modules
+
+# O.S
+.DS_Store
