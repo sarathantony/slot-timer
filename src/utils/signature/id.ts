@@ -3,5 +3,5 @@
  * @returns
  */
 export default function generateUniqueId(): string {
-  return `timer_${Math.random().toString(36).substr(2, 9)}`;
+  return `timer-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
