@@ -40,25 +40,31 @@ if (parentPort) {
            */
           const tick = () => {
             if (isPaused) return;
+
             const now = performance.now();
             elapsed = now - startTime;
 
             if (type === "countdown") {
-              const remaining = (duration || 0) - elapsed;
-              if (remaining <= 0) {
-                parentPort!.postMessage({ timeString: "00:00:00", id, done: true } as TimerResponse);
+              const remaining = (duration ?? 0) - elapsed;
+              const timeString = formatTime(remaining);
+
+              // Check if the formatted time string is "00:00:00"
+              if (timeString === "00:00:00") {
+                parentPort!.postMessage({ timeString, id, done: true } as TimerResponse);
                 clearInterval(timer!);
                 process.exit();
               } else {
-                parentPort!.postMessage({ timeString: formatTime(remaining), id } as TimerResponse);
+                parentPort!.postMessage({ timeString, id } as TimerResponse);
               }
             } else if (type === "stopwatch") {
+              const timeString = formatTime(elapsed);
+
               if (elapsed >= (duration || 0)) {
-                parentPort!.postMessage({ timeString: formatTime(duration || 0), id, done: true } as TimerResponse);
+                parentPort!.postMessage({ timeString: formatTime(duration ?? 0), id, done: true } as TimerResponse);
                 clearInterval(timer!);
                 process.exit();
               } else {
-                parentPort!.postMessage({ timeString: formatTime(elapsed), id } as TimerResponse);
+                parentPort!.postMessage({ timeString, id } as TimerResponse);
               }
             }
           };
@@ -95,7 +101,7 @@ if (parentPort) {
         if (timer) clearInterval(timer);
         elapsed = 0;
         isPaused = false;
-        parentPort!.postMessage({ timeString: formatTime(duration || 0), id } as TimerResponse);
+        parentPort!.postMessage({ timeString: formatTime(duration ?? 0), id } as TimerResponse);
         break;
 
       /**

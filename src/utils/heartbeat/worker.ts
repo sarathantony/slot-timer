@@ -46,7 +46,7 @@ self.onmessage = ({ data }: MessageEvent<{ command: string; duration?: number; t
           elapsed = now - startTime;
 
           if (type === "countdown") {
-            const remaining = (duration || 0) - elapsed;
+            const remaining = (duration ?? 0) - elapsed;
             if (remaining <= 0) {
               self.postMessage({ timeString: "00:00:00", id, done: true });
               clearInterval(timer!);
@@ -56,7 +56,7 @@ self.onmessage = ({ data }: MessageEvent<{ command: string; duration?: number; t
             self.postMessage({ timeString: formatTime(remaining), id });
           } else if (type === "stopwatch") {
             if (elapsed >= (duration || 0)) {
-              self.postMessage({ timeString: formatTime(duration || 0), id, done: true });
+              self.postMessage({ timeString: formatTime(duration ?? 0), id, done: true });
               clearInterval(timer!);
               self.close();
               return;
@@ -94,7 +94,7 @@ self.onmessage = ({ data }: MessageEvent<{ command: string; duration?: number; t
       if (timer) clearInterval(timer);
       elapsed = 0;
       isPaused = false;
-      self.postMessage({ timeString: formatTime(duration || 0), id });
+      self.postMessage({ timeString: formatTime(duration ?? 0), id });
       break;
 
     /**

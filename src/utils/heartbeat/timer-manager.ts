@@ -1,4 +1,3 @@
-
 import path from 'path';
 import { Worker } from 'worker_threads';
 
@@ -26,19 +25,31 @@ class TimerManager {
    * @throws Error if the environment is neither a browser nor Node.js.
    */
   static createTimer(options: TimerOptions): TimerInstance {
-    const id = generateUniqueId();
+    let id = generateUniqueId();
+
+    while (this.instances.has(id)) {
+      id = generateUniqueId(); // Ensure unique ID
+    }
+
     let worker: Worker;
 
-    if (typeof window !== "undefined" && typeof Worker !== "undefined") {
-      // BROWSER ENVIRONMENT..
-      const workerPath = path.resolve(__dirname, '/worker.js');
-      worker = new Worker(workerPath);
-    } else if (typeof process !== "undefined" && typeof require !== "undefined") {
-      // NODE.JS ENVIRONMENT..
-      const { Worker } = require("worker_threads");
-      worker = new Worker(__dirname + "/node-worker.js");
-    } else {
-      throw new Error("Unsupported environment for Timer");
+    try {
+      if (typeof window !== "undefined" && typeof Worker !== "undefined") {
+        // BROWSER ENVIRONMENT..
+        const workerPath = path.resolve(__dirname, '/worker.js');
+        worker = new Worker(workerPath);
+      } else if (typeof process !== "undefined" && typeof require !== "undefined") {
+        // NODE.JS ENVIRONMENT..
+        const { Worker } = require("worker_threads");
+        worker = new Worker(__dirname + "/node-worker.js");
+      } else {
+        throw new Error("Unsupported environment for Timer");
+      }
+    } catch (error) {
+      console.error("Worker initialization failed:", error);
+
+      if (options.onError) options.onError(error as Error);
+      throw error; // Re-throw the error to stop further execution
     }
 
     /**
@@ -68,8 +79,14 @@ class TimerManager {
      */
     worker.on('message', (data: WorkerResponse) => {
       const { timeString, id, done = false } = data;
+
       if (options.onTick) options.onTick(timeString, id, done);
-      if (done && options.onComplete) options.onComplete(id);
+
+      if (done && options.onComplete) {
+        options.onComplete(id);
+        worker.postMessage({ command: "stop" });
+        this.instances.delete(id);
+      }
     });
 
     /**
@@ -107,7 +124,8 @@ class TimerManager {
        */
       stop: () => {
         worker.postMessage({ command: "stop" } as WorkerMessage);
-        this.instances.delete(id);
+        worker.terminate(); // Terminate the worker
+        this.instances.delete(id); // Remove the worker from the instances map
       },
       /**
        * Pauses the timer.
