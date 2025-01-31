@@ -67,8 +67,8 @@ class TimerManager {
      * @fires options.onComplete - Invoked when the timer completes.
      */
     worker.on('message', (data: WorkerResponse) => {
-      const { timeString, id, done } = data;
-      if (options.onTick) options.onTick(timeString, id);
+      const { timeString, id, done = false } = data;
+      if (options.onTick) options.onTick(timeString, id, done);
       if (done && options.onComplete) options.onComplete(id);
     });
 

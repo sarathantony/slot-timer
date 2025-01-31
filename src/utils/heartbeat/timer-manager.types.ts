@@ -1,7 +1,7 @@
 export interface TimerOptions {
   duration: number; // Duration in milliseconds
   type: "countdown" | "stopwatch";
-  onTick?: (timeString: string, id: string) => void;
+  onTick?: (timeString: string, id: string, done: boolean) => void;
   onComplete?: (id: string) => void;
   onError?: (error: Error) => void;
 }
@@ -25,5 +25,5 @@ export interface WorkerMessage {
 export interface WorkerResponse {
   timeString: string;
   id: string;
-  done?: boolean;
+  done: boolean;
 };

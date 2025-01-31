@@ -1,3 +1,6 @@
 import TimerManager from "./utils/heartbeat/timer-manager";
 
-export { TimerManager }
+import { TimerInstance } from "./utils/heartbeat/timer-manager.types";
+
+export default TimerManager
+export type { TimerInstance }
