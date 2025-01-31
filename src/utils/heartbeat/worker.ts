@@ -1,4 +1,5 @@
 import { formatTime } from '../common';
+import { TIME_ZERO } from '../../constants/app-constants';
 
 let timer: NodeJS.Timeout | null = null;
 let startTime: number = 0;
@@ -48,7 +49,7 @@ self.onmessage = ({ data }: MessageEvent<{ command: string; duration?: number; t
           if (type === "countdown") {
             const remaining = (duration ?? 0) - elapsed;
             if (remaining <= 0) {
-              self.postMessage({ timeString: "00:00:00", id, done: true });
+              self.postMessage({ timeString: TIME_ZERO, id, done: true });
               clearInterval(timer!);
               self.close();
               return;

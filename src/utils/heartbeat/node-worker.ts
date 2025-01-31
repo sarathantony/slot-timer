@@ -3,6 +3,7 @@ import { parentPort } from 'worker_threads';
 import { TimerCommand, TimerResponse } from './worker.types';
 
 import { formatTime } from '../common';
+import { TIME_ZERO } from '../../constants/app-constants';
 
 let timer: NodeJS.Timeout | null = null;
 let startTime: number = 0;
@@ -49,7 +50,7 @@ if (parentPort) {
               const timeString = formatTime(remaining);
 
               // Check if the formatted time string is "00:00:00"
-              if (timeString === "00:00:00") {
+              if (timeString === TIME_ZERO) {
                 parentPort!.postMessage({ timeString, id, done: true } as TimerResponse);
                 clearInterval(timer!);
                 process.exit();
