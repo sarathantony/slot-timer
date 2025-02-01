@@ -1,4 +1,5 @@
 import { formatTime } from '../common';
+
 import { TIME_ZERO } from '../../constants/app-constants';
 
 let timer: NodeJS.Timeout | null = null;
